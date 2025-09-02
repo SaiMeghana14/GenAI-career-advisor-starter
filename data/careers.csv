@@ -1,0 +1,8 @@
+role,summary,required_skills
+IoT Engineer,Designs and deploys IoT solutions using microcontrollers and cloud platforms,"Embedded C;Arduino;ESP32;Raspberry Pi;IoT;Git;Cloud Computing;Blynk"
+AIoT Specialist,Builds AI-powered IoT systems with edge ML and vision,"IoT;ESP32;Computer Vision;Machine Learning;Deep Learning;Python;Git;Cloud Computing"
+Data Analyst,Analyzes data and builds dashboards for insights,"SQL;Python;Data Analysis;Power BI;Communication;Problem Solving"
+ML Engineer,Builds and deploys machine learning models,"Python;Machine Learning;Deep Learning;Computer Vision;NLP;Git;Cloud Computing"
+Embedded Systems Developer,Develops firmware and hardware interfaces,"Embedded C;Arduino;ESP32;Problem Solving;Git"
+Cloud/DevOps Associate,Automates deployments and manages cloud infra,"Cloud Computing;Git;Python;SQL"
+AI Research Intern,Explores novel models and experiments,"Deep Learning;Machine Learning;Python;MATLAB"
