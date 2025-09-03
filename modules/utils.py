@@ -77,3 +77,6 @@ def generate_pdf_report(filename, skills, career, roadmap, courses):
     doc.build(elements)
     return filename
 
+def team_compatibility(team_skills):
+    all_skills = set().union(*team_skills)
+    return len(all_skills), all_skills
