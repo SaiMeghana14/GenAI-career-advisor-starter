@@ -9,10 +9,11 @@ from reportlab.lib.styles import getSampleStyleSheet
 def get_api_key():
     """Fetch Gemini API Key from Streamlit secrets"""
     try:
-        return st.secrets["general"]["gemini_api_key"]
+        api_key = st.secrets["general"]["gemini_api_key"]
+        return "Gemini", api_key
     except KeyError:
         st.error("❌ Gemini API key missing in secrets.")
-        return None
+        return None, None
 
 # --- Bullet point formatter ---
 def bullet(points):
