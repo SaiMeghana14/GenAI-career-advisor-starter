@@ -53,3 +53,10 @@ def generate_career_roadmap(career):
         ]
     }
     return roadmaps.get(career, ["General: Keep learning and building projects!"])
+
+import json, os
+
+def get_courses_for_career(career):
+    with open("data/courses.csv", "r") as f:
+        courses = csv.load(f)
+    return courses.get(career, [])
