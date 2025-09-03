@@ -1,13 +1,19 @@
-import os
-from dotenv import load_dotenv
+import plotly.express as px
 
-def get_api_key():
-    load_dotenv()
-    for key in ["OPENAI_API_KEY","ANTHROPIC_API_KEY","GEMINI_API_KEY"]:
-        v = os.getenv(key)
-        if v:
-            return key, v
-    return None, None
+def plot_skill_gap(user_skills, required_skills):
+    """Visualize which skills are present vs missing"""
+    data = []
+    for skill in required_skills:
+        data.append({
+            "Skill": skill,
+            "Status": "Have" if skill in user_skills else "Missing"
+        })
 
-def bullet(items):
-    return "\n".join([f"- {x}" for x in items])
+    fig = px.bar(
+        data,
+        x="Skill",
+        color="Status",
+        title="Skill Gap Analysis",
+        barmode="group"
+    )
+    return fig
