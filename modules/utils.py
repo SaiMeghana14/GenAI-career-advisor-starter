@@ -1,6 +1,10 @@
 import plotly.express as px
-import openai
+import google.generativeai as genai
+import os
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 
+# Skill Gap Analyzer
 def plot_skill_gap(user_skills, required_skills):
     """Visualize which skills are present vs missing"""
     data = []
@@ -19,22 +23,27 @@ def plot_skill_gap(user_skills, required_skills):
     )
     return fig
 
+# Resume Feedback using Gemini
 def resume_feedback(user_skills, target_career):
     prompt = f"My resume shows skills: {user_skills}. I want to become a {target_career}. What am I missing?"
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return response.choices[0].message["content"]
-    except:
-        return "AI feedback not available (missing API key)."
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            return "AI feedback not available (missing API key)."
 
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"AI feedback not available: {e}"
+
+# Mock Interview Q&A
 def generate_mock_interview(career):
     questions = {
         "Data Scientist": [
             "What is the difference between supervised and unsupervised learning?",
-            "Explain bias-variance tradeoff."
+            "Explain the bias-variance tradeoff."
         ],
         "Embedded Engineer": [
             "Explain how an ESP32 differs from Arduino Uno.",
@@ -43,6 +52,7 @@ def generate_mock_interview(career):
     }
     return questions.get(career, ["Tell me about yourself."])
 
+# Gamification Badge
 def get_badge(user_skills):
     if len(user_skills) > 8:
         return "🏆 AI Master"
@@ -50,10 +60,8 @@ def get_badge(user_skills):
         return "🥈 Skilled Learner"
     else:
         return "🎯 Beginner Explorer"
-        
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
 
+# PDF Career Report
 def generate_pdf_report(filename, skills, career, roadmap, courses):
     doc = SimpleDocTemplate(filename)
     styles = getSampleStyleSheet()
@@ -72,11 +80,12 @@ def generate_pdf_report(filename, skills, career, roadmap, courses):
 
     elements.append(Paragraph("Courses:", styles['Heading3']))
     for c in courses:
-        elements.append(Paragraph(f"{c['title']} - {c['link']}", styles['Normal']))
+        elements.append(Paragraph(f"{c['course']} ({c['provider']}) - {c['url']}", styles['Normal']))
 
     doc.build(elements)
     return filename
 
+# Team Collaboration
 def team_compatibility(team_skills):
     all_skills = set().union(*team_skills)
     return len(all_skills), all_skills
