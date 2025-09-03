@@ -1,10 +1,40 @@
+import streamlit as st
 import plotly.express as px
 import google.generativeai as genai
 import os
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
-# Skill Gap Analyzer
+# --- Get API Key ---
+def get_api_key():
+    """Fetch Gemini API Key from Streamlit secrets"""
+    try:
+        return st.secrets["general"]["gemini_api_key"]
+    except KeyError:
+        st.error("❌ Gemini API key missing in secrets.")
+        return None
+
+# --- Bullet point formatter ---
+def bullet(points):
+    """Convert a list of strings into a bullet point formatted string"""
+    if isinstance(points, str):  # If a single string is passed
+        return f"• {points}"
+    return "\n".join([f"• {p}" for p in points])
+
+# --- Gemini Wrapper ---
+def generate_with_gemini(prompt):
+    """Generate text response using Google Gemini"""
+    api_key = get_api_key()
+    if not api_key:
+        return "⚠️ No API key found."
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
+    return response.text
+    
+# =========================
+# 📊 Skill Gap Chart
+# =========================
 def plot_skill_gap(user_skills, required_skills):
     """Visualize which skills are present vs missing"""
     data = []
