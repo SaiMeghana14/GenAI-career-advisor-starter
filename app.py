@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
 from modules.resume_parser import read_pdf_text, extract_skills
-from modules.recommender import build_models, recommend_roles, recommend_courses
-from modules.utils import get_api_key, bullet
+from modules.recommender import build_models, recommend_roles, recommend_courses, generate_career_roadmap, get_courses_for_career
+from modules.utils import get_api_key, bullet, plot_skill_gap, resume_feedback, generate_mock_interview, get_badge, generate_pdf_report, team_compatibility
 
 st.set_page_config(page_title="GenAI Career & Skills Advisor", page_icon="🎯", layout="wide")
 
 st.title("🎯 GenAI Career & Skills Advisor")
-st.write("Upload your resume or type your skills to get role matches, skill gaps, courses, and a roadmap.")
+st.write("Upload your resume or type your skills to get role matches, skill gaps, courses, roadmap, AI feedback, and more!")
 
 # Load data
 careers_df = pd.read_csv("data/careers.csv")
@@ -60,6 +60,12 @@ if st.button("Recommend!"):
     st.markdown("**You need to learn:**")
     st.code(bullet(gaps) or "No major gaps — you're ready!")
 
+    # ✅ Skill Gap Analyzer (Visual)
+    st.subheader("📊 Skill Gap Analyzer")
+    fig = plot_skill_gap(have, gaps + have)  # show have vs missing
+    st.plotly_chart(fig, use_container_width=True)
+
+    # ✅ Course Recs
     st.markdown("### 📚 Courses to Close Gaps")
     course_recs = recommend_courses(gaps, courses_df)
     if course_recs.empty:
@@ -67,32 +73,53 @@ if st.button("Recommend!"):
     else:
         st.dataframe(course_recs[['course','provider','skill','url','reason']])
 
-    st.markdown("### 🗺️ 8-Week Roadmap")
-    if gaps:
-        steps = [
-            "Weeks 1–2: Master the basics of " + (gaps[0] if len(gaps)>0 else ""),
-            "Weeks 3–4: Build a mini-project applying the above skill",
-            "Weeks 5–6: Learn " + (gaps[1] if len(gaps)>1 else "an advanced concept in your chosen role"),
-            "Weeks 7–8: Capstone project + polish portfolio and resume",
-        ]
-    else:
-        steps = [
-            "Weeks 1–2: Build a portfolio project in your target role",
-            "Weeks 3–4: Add tests, docs, and deploy your project",
-            "Weeks 5–6: Prepare for interviews (DSA + system/design as relevant)",
-            "Weeks 7–8: Network, apply to 10–15 positions, refine applications",
-        ]
-    st.code(bullet(steps))
+    # ✅ Career Roadmap
+    st.markdown("### 🛤 Career Roadmap")
+    roadmap = generate_career_roadmap(top_role['role'])
+    for i, step in enumerate(roadmap, 1):
+        st.markdown(f"**Step {i}:** {step}")
 
+    # ✅ Resume Feedback (AI-powered)
+    st.subheader("💡 Resume Feedback")
     key_name, api_key = get_api_key()
     if api_key:
-        st.caption(f"LLM provider detected: {key_name}. (Hook up your advice module here.)")
+        feedback = resume_feedback(user_skills, top_role['role'])
+        st.write(feedback)
     else:
-        st.caption("Tip: Add an API key in .env to generate AI-tailored narrative advice.")
+        st.info("Add an API key in `.env` to enable AI-powered resume feedback.")
+
+    # ✅ Mock Interview Q&A
+    st.subheader("🎤 Mock Interview Practice")
+    questions = generate_mock_interview(top_role['role'])
+    for q in questions:
+        st.markdown(f"- {q}")
+
+    # ✅ Gamification Badge
+    st.subheader("🏅 Your Skill Badge")
+    badge = get_badge(user_skills)
+    st.success(f"Your Badge: {badge}")
+
+    # ✅ Export Career Report
+    st.subheader("📥 Download Personalized Career Report")
+    if st.button("Generate PDF Report"):
+        filename = "career_report.pdf"
+        generate_pdf_report(filename, user_skills, top_role['role'], roadmap, course_recs.to_dict(orient="records"))
+        with open(filename, "rb") as f:
+            st.download_button("Download PDF", f, file_name="career_report.pdf")
+
+    # ✅ Team Collaboration Mode
+    st.subheader("🤝 Team Collaboration Mode")
+    team_input = st.text_area("Enter skills of your teammates (comma-separated per line)")
+    if team_input:
+        team_skills = [set(line.split(",")) for line in team_input.splitlines()]
+        score, combined = team_compatibility(team_skills)
+        st.write(f"**Team Compatibility Score:** {score}")
+        st.write(f"**Combined Skills:** {', '.join(combined)}")
 
 else:
     st.info("Upload a resume or type your skills, then click **Recommend!**")
 
 st.sidebar.header("About")
-st.sidebar.write("Built for GenAI Exchange Hackathon. Replace `data/*.csv` with richer datasets.")
+st.sidebar.write("Built for GenAI Exchange Hackathon 🚀")
+st.sidebar.write("Features: Resume Parsing, Role Matching, Skill Gap Charts, Roadmaps, AI Feedback, Mock Interviews, Gamification, Team Mode, PDF Reports.")
 st.sidebar.write("MIT License")
