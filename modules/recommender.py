@@ -34,3 +34,22 @@ def recommend_courses(gap_skills: List[str], courses_df: pd.DataFrame) -> pd.Dat
     out = courses_df[mask].copy()
     out['reason'] = out['skill'].apply(lambda s: f"To close the '{s}' gap")
     return out
+    
+def generate_career_roadmap(career):
+    roadmaps = {
+        "Data Scientist": [
+            "Learn Python basics",
+            "Master data visualization",
+            "Do an ML course",
+            "Build ML projects",
+            "Learn deep learning"
+        ],
+        "Embedded Engineer": [
+            "Learn Embedded C",
+            "Understand microcontrollers",
+            "Hands-on with Arduino & ESP32",
+            "Work with IoT platforms like Blynk",
+            "Build an IoT project"
+        ]
+    }
+    return roadmaps.get(career, ["General: Keep learning and building projects!"])
