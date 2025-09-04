@@ -62,7 +62,7 @@ from modules.utils import (
 # --------------------------
 st.set_page_config(page_title="GenAI Career & Skills Advisor", page_icon="🎯", layout="wide")
 
-# Dark/Light toggle (simple CSS theme swap)
+# Dark/Light toggle
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = False
 st.sidebar.toggle("🌗 Dark Mode", key="dark_mode")
@@ -76,7 +76,7 @@ if st.session_state.dark_mode:
     """, unsafe_allow_html=True)
 
 # --------------------------
-# Header + Lottie (optional)
+# Helper: Load Lottie file
 # --------------------------
 def load_lottie_file(filepath: str):
     try:
@@ -86,18 +86,83 @@ def load_lottie_file(filepath: str):
         st.error(f"Error loading Lottie file: {e}")
         return None
 
-with st.container():
-    c1, c2 = st.columns([0.85, 0.15])
-    with c1:
-        st.title("🎯 GenAI Career & Skills Advisor")
-        st.write("Upload your resume or type your skills to get role matches, skill gaps, courses, roadmap, AI feedback, mock interview, gamified progress, and more!")
-    with c2:
-        rocket = load_lottie_file("assets/hero.json")  # ✅ Local file
-        if rocket:
-            st_lottie(rocket, height=120, key="lottie-rocket")
+# --------------------------
+# Custom Styling (Hero, Buttons, Cards)
+# --------------------------
+st.markdown("""
+<style>
+/* Hero section */
+.hero {
+    background: linear-gradient(90deg, #4f46e5, #9333ea);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+.hero h1 { font-size: 2.4rem; margin-bottom: 0.5rem; }
+.hero p { font-size: 1.1rem; opacity: 0.9; }
 
-# Secrets debug (kept from your code)
-st.caption("Debug: Available secrets → " + str(list(st.secrets.keys())))
+/* Card-style upload */
+.upload-card {
+    border: 2px dashed #ccc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    background: #fafafa;
+}
+.upload-card:hover {
+    border-color: #4f46e5;
+    background: #f5f3ff;
+}
+
+/* Gradient button */
+.stButton>button {
+    background: linear-gradient(90deg, #4f46e5, #9333ea);
+    color: white;
+    border-radius: 8px;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+}
+.stButton>button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #9333ea, #4f46e5);
+}
+
+/* Sidebar cards */
+.sidebar-card {
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+</style>
+""", unsafe_allow_html=True)
+
+# --------------------------
+# Hero Section
+# --------------------------
+with st.container():
+    col1, col2 = st.columns([0.7, 0.3])
+    with col1:
+        st.markdown("""
+        <div class="hero">
+            <h1>🎯 GenAI Career & Skills Advisor</h1>
+            <p>Upload your resume or type your skills to get role matches, skill gaps, roadmaps, AI feedback, mock interviews, gamified progress, and more!</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        rocket = load_lottie_file("assets/hero.json")
+        if rocket:
+            st_lottie(rocket, height=180, key="lottie-rocket")
+
+# --------------------------
+# Secrets Debug
+# --------------------------
+st.caption("🔧 Debug: Available secrets → " + str(list(st.secrets.keys())))
 try:
     st.sidebar.write("🔑 GEMINI_API_KEY loaded?", "GEMINI_API_KEY" in st.secrets)
     if "GEMINI_API_KEY" in st.secrets:
@@ -556,10 +621,58 @@ else:
     st.info("Upload a resume or type your skills, then click **Recommend!**")
 
 # --------------------------
-# Sidebar (existing)
+# Sidebar Dashboard
 # --------------------------
-st.sidebar.header("About")
-st.sidebar.write("Built for GenAI Exchange Hackathon 🚀")
+st.sidebar.markdown("## 📊 Career Dashboard")
+
+# If user has results, show KPIs
+if "recs" in locals() and not recs.empty:
+    top_role = recs.iloc[0]
+    match_pct = int(top_role['match_pct'])
+    have_count = len(top_role['have']) if isinstance(top_role['have'], (list,set)) else 0
+    gaps_count = len(top_role['gaps']) if isinstance(top_role['gaps'], (list,set)) else 0
+    readiness = round(match_pct * (have_count / (have_count + gaps_count + 1)), 1)
+
+    with st.sidebar.container():
+        st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
+        st.metric("🎯 Match %", f"{match_pct}%")
+        st.metric("📚 Skills You Have", have_count)
+        st.metric("🧩 Skills to Learn", gaps_count)
+        st.metric("⏳ Readiness Score", f"{readiness}%")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # Progress bar
+        st.progress(min(1.0, match_pct/100))
+
+# Gemini API Key status
+st.sidebar.markdown("## 🔑 API Key")
+if "GEMINI_API_KEY" in st.secrets:
+    st.sidebar.success("Gemini key available")
+else:
+    st.sidebar.error("No GEMINI_API_KEY found")
+
+# About / Features
+st.sidebar.markdown("## ℹ️ About")
+st.sidebar.write("Built for **GenAI Exchange Hackathon** 🚀")
 st.sidebar.write("Features: Resume Parsing, Role Matching, Skill Gap Charts, Roadmaps, AI Feedback, Mock Interviews, Gamification, Team Mode, PDF Reports.")
-st.sidebar.write("✨ Upgrades: KPI Dashboard, Progress Tracker, Word Cloud, Network Graph, Timeline, Interview Chat, Role Comparison, Market Insights, Quiz Mode, Portfolio, Team Radar, Lottie, Dark Mode, Toasts & Balloons.")
-st.sidebar.write("MIT License")
+
+st.sidebar.markdown("## ✨ Upgrades")
+st.sidebar.write("""
+- KPI Dashboard  
+- Progress Tracker  
+- Word Cloud  
+- Network Graph  
+- Timeline Roadmap  
+- Interview Chat  
+- Role Comparison  
+- Market Insights  
+- Quiz Mode  
+- Portfolio View  
+- Team Radar  
+- Lottie Animations  
+- Dark/Light Mode  
+- Toasts & Balloons  
+""")
+
+st.sidebar.info("MIT License")
+
