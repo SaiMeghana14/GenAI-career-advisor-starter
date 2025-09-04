@@ -18,17 +18,6 @@ def bullet(points):
     if isinstance(points, str):  # If a single string is passed
         return f"• {points}"
     return "\n".join([f"• {p}" for p in points])
-
-# --- Gemini Wrapper ---
-def generate_with_gemini(prompt):
-    """Generate text response using Google Gemini"""
-    api_key = get_api_key()
-    if not api_key:
-        return "⚠️ No API key found."
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content(prompt)
-    return response.text
     
 # =========================
 # 📊 Skill Gap Chart
@@ -52,19 +41,32 @@ def plot_skill_gap(user_skills, required_skills):
     return fig
 
 # Resume Feedback using Gemini
-def resume_feedback(user_skills, target_career):
-    prompt = f"My resume shows skills: {user_skills}. I want to become a {target_career}. What am I missing?"
-    try:
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            return "AI feedback not available (missing API key)."
+def resume_feedback(skills, role):
+    """Generate AI-powered resume feedback using Gemini"""
+    key_name, api_key = get_api_key()
+    if not api_key:
+        raise ValueError("❌ Gemini API key not found. Please add GEMINI_API_KEY in secrets.toml")
 
-        genai.configure(api_key=api_key)
+    # Configure Gemini
+    genai.configure(api_key=api_key)
+
+    # Build prompt
+    prompt = f"""
+    You are a career advisor. A user has the following skills: {skills}.
+    Their target role is: {role}.
+    Give specific, actionable resume feedback:
+    - Missing skills/tools to highlight
+    - Projects or achievements they should emphasize
+    - Any tips to stand out in hiring
+    Be concise but practical.
+    """
+
+    try:
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(prompt)
-        return response.text
+        return response.text.strip()
     except Exception as e:
-        return f"AI feedback not available: {e}"
+        return f"⚠️ Error while generating feedback: {e}"
 
 # Mock Interview Q&A
 def generate_mock_interview(career):
