@@ -184,7 +184,7 @@ vec, X = build_models(careers_df)
 # --------------------------
 # Inputs
 # --------------------------
-tab1, tab2, tab3, tab4 = st.tabs(["📄 Resume Upload","⌨️ Type Skills", 🤖 AI Mentor, 👥 Team Compatibility])
+tab1, tab2, tab3, tab4 = st.tabs(["📄 Resume Upload","⌨️ Type Skills", "🤖 AI Mentor", "👥 Team Compatibility"])
 user_skills = []
 raw_text = ""
 
