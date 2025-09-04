@@ -21,12 +21,16 @@ tab1, tab2 = st.tabs(["Resume Upload","Type Skills"])
 user_skills = []
 raw_text = ""
 
+import tempfile
+
 with tab1:
     file = st.file_uploader("Upload PDF Resume", type=["pdf"])
     if file is not None:
-        path = f"/mnt/data/_resume_tmp.pdf"
-        with open(path,"wb") as f:
-            f.write(file.read())
+        # Use a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            tmp_file.write(file.read())
+            path = tmp_file.name
+
         raw_text = read_pdf_text(path)
         skills_found, joined = extract_skills(raw_text)
         st.success(f"Extracted skills: {', '.join(skills_found) if skills_found else 'None'}")
@@ -47,6 +51,10 @@ if st.button("Recommend!"):
     st.subheader("🔎 Best-Fit Roles")
     recs = recommend_roles(user_skills, careers_df, vec, X, top_k=5)
     st.dataframe(recs[['role','summary','match_pct','have','gaps']])
+    
+    if recs.empty:
+    st.error("No matching roles found. Try adding more skills.")
+    st.stop()
 
     top_role = recs.iloc[0]
     st.markdown(f"### 🏆 Top Role: **{top_role['role']}** ({top_role['match_pct']}% match)")
@@ -62,7 +70,7 @@ if st.button("Recommend!"):
 
     # ✅ Skill Gap Analyzer (Visual)
     st.subheader("📊 Skill Gap Analyzer")
-    fig = plot_skill_gap(have, gaps + have)  # show have vs missing
+    fig = plot_skill_gap(have, have + gaps)
     st.plotly_chart(fig, use_container_width=True)
 
     # ✅ Course Recs
@@ -111,7 +119,7 @@ if st.button("Recommend!"):
     st.subheader("🤝 Team Collaboration Mode")
     team_input = st.text_area("Enter skills of your teammates (comma-separated per line)")
     if team_input:
-        team_skills = [set(line.split(",")) for line in team_input.splitlines()]
+        team_skills = [set(s.strip() for s in line.split(",") if s.strip()) for line in team_input.splitlines()]
         score, combined = team_compatibility(team_skills)
         st.write(f"**Team Compatibility Score:** {score}")
         st.write(f"**Combined Skills:** {', '.join(combined)}")
