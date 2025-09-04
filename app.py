@@ -91,10 +91,11 @@ if st.button("Recommend!"):
 
     # ✅ Resume Feedback (AI-powered)
     st.subheader("💡 Resume Feedback")
-    key_name, api_key = get_api_key()
-    if not api_key:
-        st.error("❌ Gemini API key missing in secrets.")
-        st.stop()
+    try:
+        feedback = resume_feedback(user_skills, top_role['role'])
+        st.write(feedback)
+    except ValueError as e:
+        st.error(str(e))
 
     # ✅ Mock Interview Q&A
     st.subheader("🎤 Mock Interview Practice")
