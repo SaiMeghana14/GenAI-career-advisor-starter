@@ -379,14 +379,14 @@ if st.button("🚀 Recommend!"):
     st.plotly_chart(fig, use_container_width=True)
     
     if st.button("✨ Simulate Future You"):
-    st.markdown("""
-    ## 🔮 Your Future LinkedIn Profile (1 year later)
-
-    **Name:** GenAI Student  
-    **Role:** Data Scientist at TechCorp  
-    **Headline:** "AI Enthusiast | Python | ML | SQL | Deep Learning"  
-    **About:** Passionate about solving real-world problems using AI...
-    """)
+        st.markdown("""
+        ## 🔮 Your Future LinkedIn Profile (1 year later)
+    
+        **Name:** GenAI Student  
+        **Role:** Data Scientist at TechCorp  
+        **Headline:** "AI Enthusiast | Python | ML | SQL | Deep Learning"  
+        **About:** Passionate about solving real-world problems using AI...
+        """)
 
     # --------------------------
     # Interactive Visualizations
