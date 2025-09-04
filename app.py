@@ -9,6 +9,17 @@ st.set_page_config(page_title="GenAI Career & Skills Advisor", page_icon="🎯",
 st.title("🎯 GenAI Career & Skills Advisor")
 st.write("Upload your resume or type your skills to get role matches, skill gaps, courses, roadmap, AI feedback, and more!")
 
+import os
+
+try:
+    st.sidebar.write("🔑 GEMINI_API_KEY loaded?", "GEMINI_API_KEY" in st.secrets)
+    if "GEMINI_API_KEY" in st.secrets:
+        st.sidebar.write("✅ Key exists (length hidden)")
+    else:
+        st.sidebar.error("❌ No GEMINI_API_KEY found in secrets.toml")
+except Exception as e:
+    st.sidebar.error(f"Secrets error: {e}")
+
 # Load data
 careers_df = pd.read_csv("data/careers.csv")
 courses_df = pd.read_csv("data/courses.csv")
