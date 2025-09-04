@@ -9,3 +9,4 @@ python-docx
 plotly
 reportlab
 google-generativeai
+wordcloud
