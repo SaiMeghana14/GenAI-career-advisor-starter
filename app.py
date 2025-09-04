@@ -10,6 +10,7 @@ st.title("🎯 GenAI Career & Skills Advisor")
 st.write("Upload your resume or type your skills to get role matches, skill gaps, courses, roadmap, AI feedback, and more!")
 
 import os
+st.write("Available secrets:", list(st.secrets.keys()))
 
 try:
     st.sidebar.write("🔑 GEMINI_API_KEY loaded?", "GEMINI_API_KEY" in st.secrets)
