@@ -4,6 +4,7 @@ import json
 import time
 import math
 from datetime import datetime, timedelta
+from streamlit_lottie import st_lottie
 
 import streamlit as st
 import pandas as pd
