@@ -54,7 +54,7 @@ if st.button("Recommend!"):
     
     if recs.empty:
         st.error("No matching roles found. Try adding more skills.")
-    st.stop()
+        st.stop()
 
     top_role = recs.iloc[0]
     st.markdown(f"### 🏆 Top Role: **{top_role['role']}** ({top_role['match_pct']}% match)")
@@ -70,6 +70,8 @@ if st.button("Recommend!"):
 
     # ✅ Skill Gap Analyzer (Visual)
     st.subheader("📊 Skill Gap Analyzer")
+    have = list(have) if not isinstance(have, list) else have
+    gaps = list(gaps) if not isinstance(gaps, list) else gaps
     fig = plot_skill_gap(have, have + gaps)
     st.plotly_chart(fig, use_container_width=True)
 
@@ -111,7 +113,9 @@ if st.button("Recommend!"):
     st.subheader("📥 Download Personalized Career Report")
     if st.button("Generate PDF Report"):
         filename = "career_report.pdf"
-        generate_pdf_report(filename, user_skills, top_role['role'], roadmap, course_recs.to_dict(orient="records"))
+        courses = course_recs.to_dict(orient="records") if not course_recs.empty else []
+        generate_pdf_report(filename, user_skills, top_role['role'], roadmap, courses)
+
         with open(filename, "rb") as f:
             st.download_button("Download PDF", f, file_name="career_report.pdf")
 
