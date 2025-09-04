@@ -7,12 +7,9 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 # --- Get API Key ---
 def get_api_key():
-    """Fetch Gemini API Key from Streamlit secrets"""
-    try:
-        api_key = st.secrets["general"]["gemini_api_key"]
-        return "Gemini", api_key
-    except KeyError:
-        st.error("❌ Gemini API key missing in secrets.")
+    if "GEMINI_API_KEY" in st.secrets:
+        return "GEMINI_API_KEY", st.secrets["GEMINI_API_KEY"]
+    else:
         return None, None
 
 # --- Bullet point formatter ---
