@@ -184,7 +184,7 @@ vec, X = build_models(careers_df)
 # --------------------------
 # Inputs
 # --------------------------
-tab1, tab2 = st.tabs(["📄 Resume Upload","⌨️ Type Skills"])
+tab1, tab2, tab3, tab4 = st.tabs(["📄 Resume Upload","⌨️ Type Skills", 🤖 AI Mentor, 👥 Team Compatibility])
 user_skills = []
 raw_text = ""
 
@@ -207,6 +207,37 @@ with tab2:
     if typed:
         user_skills = [s.strip() for s in typed.split(",") if s.strip()]
 
+with tab3:
+    st.subheader("Ask your AI Mentor")
+    query = st.text_input("Type your question:", placeholder="e.g. What should I learn next for AI Product Manager?")
+    
+    if query:
+        import google.generativeai as genai
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(query)
+        st.write("💡 Mentor says:", response.text)
+
+with tab4:
+    st.subheader("Upload teammates’ resumes")
+    team_files = st.file_uploader("Upload multiple resumes", type=["pdf"], accept_multiple_files=True)
+
+    if team_files:
+        team_skills = []
+        for f in team_files:
+            text = read_pdf_text(f)
+            skills, _ = extract_skills(text)
+            team_skills.extend(skills)
+
+        team_unique = set(team_skills)
+        st.write("📌 Combined Team Skills:", ", ".join(team_unique))
+
+        fig = go.Figure(data=[go.Bar(
+            x=list(team_unique),
+            y=[team_skills.count(s) for s in team_unique]
+        )])
+        st.plotly_chart(fig, use_container_width=True)
+
 st.divider()
 
 # Session defaults for trackers
@@ -216,7 +247,7 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []  # [(role/user, text)]
 if "quiz_state" not in st.session_state:
     st.session_state.quiz_state = {"questions": [], "answers": {}, "score": None}
-
+    
 # --------------------------
 # Recommend Button
 # --------------------------
@@ -248,6 +279,27 @@ if st.button("🚀 Recommend!"):
         st.markdown("**You need to learn:**")
         st.code(bullet(gaps) or "No major gaps — you're ready!")
 
+    # --------------------------
+    # New: Explainable AI Insights
+    # --------------------------
+    st.subheader("📊 Explainable AI Insights")
+    matched = set(have)
+    missing = set(gaps)
+    st.write(f"✅ Matched Skills: {', '.join(matched) if matched else 'None'}")
+    st.write(f"❌ Missing Skills: {', '.join(missing) if missing else 'None'}")
+    
+    
+    fig = go.Figure(data=go.Scatterpolar(r=[1 if s in matched else 0 for s in have+gaps], theta=have+gaps, fill='toself'))
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0,1])), showlegend=False)
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # --------------------------
+    # New: Gamification Progress & Badges
+    # --------------------------
+    progress = len(matched) / len(expected_skills)
+    st.subheader("🏆 Skill Progress")
+    st.progress(progress)
+    
     # --------------------------
     # Personalized Career Dashboard (KPIs)
     # --------------------------
@@ -312,6 +364,29 @@ if st.button("🚀 Recommend!"):
         radar.add_trace(go.Scatterpolar(r=target_vals, theta=skill_set, fill='toself', name="Target"))
         radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 1])), showlegend=True)
         st.plotly_chart(radar, use_container_width=True)
+
+    st.subheader("🛣️ Personalized Roadmap")
+
+    roadmap = [
+        ("Week 1", "Python"),
+        ("Week 2", "SQL"),
+        ("Week 3", "Machine Learning Basics"),
+        ("Week 4", "Deep Learning"),
+    ]
+    
+    timeline = pd.DataFrame(roadmap, columns=["Week", "Skill"])
+    fig = px.timeline(timeline, x_start="Week", x_end="Week", y="Skill", color="Skill")
+    st.plotly_chart(fig, use_container_width=True)
+    
+    if st.button("✨ Simulate Future You"):
+    st.markdown("""
+    ## 🔮 Your Future LinkedIn Profile (1 year later)
+
+    **Name:** GenAI Student  
+    **Role:** Data Scientist at TechCorp  
+    **Headline:** "AI Enthusiast | Python | ML | SQL | Deep Learning"  
+    **About:** Passionate about solving real-world problems using AI...
+    """)
 
     # --------------------------
     # Interactive Visualizations
@@ -531,6 +606,14 @@ if st.button("🚀 Recommend!"):
             st.session_state.quiz_state["score"] = score
             st.success(f"Your score: {score}/{len(qs)}")
             if score == len(qs): st.balloons()
+                
+    st.subheader("📌 Latest Jobs (Mock Integration)")
+    jobs = [
+        {"role": "Data Scientist", "company": "Google", "location": "Bangalore"},
+        {"role": "AI Engineer", "company": "Microsoft", "location": "Hyderabad"},
+    ]
+    for job in jobs:
+        st.write(f"**{job['role']}** at {job['company']} ({job['location']})")
 
     # --------------------------
     # Portfolio Integration
@@ -575,6 +658,12 @@ if st.button("🚀 Recommend!"):
     badge = get_badge(user_skills)
     st.success(f"Your Badge: {badge}")
 
+    # Badges
+    if len(matched) >= 3:
+        st.success("🔥 You unlocked the **AI Explorer Badge**!")
+    if len(matched) >= 5:
+        st.success("🚀 You unlocked the **Data Pro Badge**!")
+    
     # --------------------------
     # Export Career Report (existing)
     # --------------------------
