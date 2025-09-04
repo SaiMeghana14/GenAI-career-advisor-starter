@@ -53,7 +53,7 @@ if st.button("Recommend!"):
     st.dataframe(recs[['role','summary','match_pct','have','gaps']])
     
     if recs.empty:
-    st.error("No matching roles found. Try adding more skills.")
+        st.error("No matching roles found. Try adding more skills.")
     st.stop()
 
     top_role = recs.iloc[0]
