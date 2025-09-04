@@ -10,7 +10,7 @@ def read_pdf_text(file_path: str) -> str:
     return text
 
 # Simple skill extractor (extend with NLP if needed)
-def extract_skills(text: str) -> list:
+def extract_skills(text: str):
     skills = [
         "Python", "C", "C++", "Java", "JavaScript", "SQL",
         "IoT", "Machine Learning", "Deep Learning",
@@ -21,4 +21,8 @@ def extract_skills(text: str) -> list:
     for skill in skills:
         if re.search(rf"\b{skill}\b", text, re.IGNORECASE):
             found.append(skill)
-    return list(set(found))
+
+    found = list(set(found))  # remove duplicates
+    joined = ", ".join(found) if found else ""
+    return found, joined
+
