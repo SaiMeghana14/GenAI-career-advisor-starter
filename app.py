@@ -77,11 +77,12 @@ if st.session_state.dark_mode:
 # --------------------------
 # Header + Lottie (optional)
 # --------------------------
-def lottie(url):
-    if not REQUESTS_OK: return None
+def load_lottie_file(filepath: str):
     try:
-        return requests.get(url).json()
-    except Exception:
+        with open(filepath, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        st.error(f"Error loading Lottie file: {e}")
         return None
 
 with st.container():
@@ -90,12 +91,9 @@ with st.container():
         st.title("🎯 GenAI Career & Skills Advisor")
         st.write("Upload your resume or type your skills to get role matches, skill gaps, courses, roadmap, AI feedback, mock interview, gamified progress, and more!")
     with c2:
-        try:
-            from streamlit_lottie import st_lottie
-            rocket = lottie("assets/hero.json")
-            if rocket: st_lottie(rocket, height=120, key="lottie-rocket")
-        except Exception:
-            pass
+        rocket = load_lottie_file("assets/hero.json")  # ✅ Local file
+        if rocket:
+            st_lottie(rocket, height=120, key="lottie-rocket")
 
 # Secrets debug (kept from your code)
 st.caption("Debug: Available secrets → " + str(list(st.secrets.keys())))
