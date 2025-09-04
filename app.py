@@ -35,11 +35,22 @@ try:
     REQUESTS_OK = True
 except Exception:
     REQUESTS_OK = False
+    
+# Configure Gemini API
+import google.generativeai as genai
+try:
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    MODEL_NAME = "gemini-1.5-flash"
+    model = genai.GenerativeModel(MODEL_NAME)
 
+    # quick sanity check
+    test_res = model.generate_content("ping")
+    st.sidebar.success(f"✅ Gemini connected ({MODEL_NAME}): {test_res.text[:30]}...")
+except Exception as e:
+    st.sidebar.error(f"Gemini init failed: {e}")
 # Gemini (optional, used for interview feedback + quiz)
 GEMINI_OK = False
 try:
-    import google.generativeai as genai
     if "GEMINI_API_KEY" in st.secrets:
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
         GEMINI_OK = True
