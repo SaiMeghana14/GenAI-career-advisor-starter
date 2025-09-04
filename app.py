@@ -92,7 +92,7 @@ with st.container():
     with c2:
         try:
             from streamlit_lottie import st_lottie
-            rocket = lottie("https://assets8.lottiefiles.com/packages/lf20_q5pk6p1k.json")
+            rocket = lottie("assets/hero.json")
             if rocket: st_lottie(rocket, height=120, key="lottie-rocket")
         except Exception:
             pass
