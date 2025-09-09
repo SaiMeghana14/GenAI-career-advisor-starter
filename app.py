@@ -48,14 +48,6 @@ try:
     st.sidebar.success(f"✅ Gemini connected ({MODEL_NAME}): {test_res.text[:30]}...")
 except Exception as e:
     st.sidebar.error(f"Gemini init failed: {e}")
-# Gemini (optional, used for interview feedback + quiz)
-GEMINI_OK = False
-try:
-    if "GEMINI_API_KEY" in st.secrets:
-        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        GEMINI_OK = True
-except Exception:
-    GEMINI_OK = False
 
 # Local modules (existing features - unchanged)
 from modules.resume_parser import read_pdf_text, extract_skills
@@ -184,7 +176,7 @@ except Exception as e:
     st.sidebar.error(f"Secrets error: {e}")
 
 # --------------------------
-# Data Load (existing)
+# Data Load 
 # --------------------------
 careers_df = pd.read_csv("data/careers.csv")
 courses_df = pd.read_csv("data/courses.csv")
@@ -195,7 +187,7 @@ vec, X = build_models(careers_df)
 # --------------------------
 # Inputs
 # --------------------------
-tab1, tab2, tab3, tab4 = st.tabs(["📄 Resume Upload","⌨️ Type Skills", "🤖 AI Mentor", "👥 Team Compatibility"])
+tab1, tab2, tab3, tab4 = st.tabs(["📄 Resume Upload","⌨️ Type Skills", " 🤖 AI Mentor", "👥 Team Compatibility"])
 user_skills = []
 raw_text = ""
 
@@ -281,7 +273,7 @@ if st.button("🚀 Recommend!"):
     have = list(top_role['have']) if not isinstance(top_role['have'], list) else top_role['have']
     gaps = list(top_role['gaps']) if not isinstance(top_role['gaps'], list) else top_role['gaps']
 
-    # Have / Need lists (existing)
+    # Have / Need lists 
     colA, colB = st.columns(2)
     with colA:
         st.markdown("**You already have:**")
@@ -468,7 +460,7 @@ if st.button("🚀 Recommend!"):
         st.plotly_chart(fig_tl, use_container_width=True)
 
     # --------------------------
-    # Courses (existing)
+    # Courses 
     # --------------------------
     st.markdown("### 📚 Courses to Close Gaps")
     course_recs = recommend_courses(gaps, courses_df)
@@ -653,7 +645,7 @@ if st.button("🚀 Recommend!"):
         st.info("Install `requests` to enable GitHub integration.")
 
     # --------------------------
-    # Resume Feedback (existing)
+    # Resume Feedback 
     # --------------------------
     st.subheader("💡 Resume Feedback")
     try:
@@ -663,7 +655,7 @@ if st.button("🚀 Recommend!"):
         st.error(str(e))
 
     # --------------------------
-    # Gamification Badge (existing)
+    # Gamification Badge 
     # --------------------------
     st.subheader("🏅 Your Skill Badge")
     badge = get_badge(user_skills)
@@ -676,7 +668,7 @@ if st.button("🚀 Recommend!"):
         st.success("🚀 You unlocked the **Data Pro Badge**!")
     
     # --------------------------
-    # Export Career Report (existing)
+    # Export Career Report 
     # --------------------------
     st.subheader("📥 Download Personalized Career Report")
     if st.button("Generate PDF Report"):
