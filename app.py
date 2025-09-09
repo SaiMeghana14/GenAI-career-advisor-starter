@@ -736,13 +736,6 @@ if "recs" in locals() and not recs.empty:
         # Progress bar
         st.progress(min(1.0, match_pct/100))
 
-# Gemini API Key status
-st.sidebar.markdown("## 🔑 API Key")
-if "GEMINI_API_KEY" in st.secrets:
-    st.sidebar.success("Gemini key available")
-else:
-    st.sidebar.error("No GEMINI_API_KEY found")
-
 # About / Features
 st.sidebar.markdown("## ℹ️ About")
 st.sidebar.write("Built for **GenAI Exchange Hackathon** 🚀")
