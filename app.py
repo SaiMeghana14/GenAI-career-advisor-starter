@@ -40,7 +40,7 @@ except Exception:
 import google.generativeai as genai
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    MODEL_NAME = "gemini-1.5-flash-002"
+    MODEL_NAME = "gemini-1.5-flash"
     model = genai.GenerativeModel(MODEL_NAME)
 
     # quick sanity check
@@ -217,7 +217,7 @@ with tab3:
     if query:
         import google.generativeai as genai
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        model = genai.GenerativeModel("gemini-pro")
+        model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(query)
         st.write("💡 Mentor says:", response.text)
 
