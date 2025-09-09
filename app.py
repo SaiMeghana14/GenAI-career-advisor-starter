@@ -40,7 +40,7 @@ except Exception:
 import google.generativeai as genai
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    MODEL_NAME = "gemini-1.5-flash"
+    MODEL_NAME = "gemini-1.5-flash-002"
     model = genai.GenerativeModel(MODEL_NAME)
 
     # quick sanity check
