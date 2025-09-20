@@ -369,8 +369,9 @@ if st.button("🚀 Recommend!"):
         radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 1])), showlegend=True)
         st.plotly_chart(radar, use_container_width=True)
 
-    st.subheader("🛣️ Personalized Roadmap")
+   st.subheader("🛣️ Personalized Roadmap")
 
+# Define roadmap
     roadmap = [
         ("Week 1", "Python"),
         ("Week 2", "SQL"),
@@ -378,10 +379,22 @@ if st.button("🚀 Recommend!"):
         ("Week 4", "Deep Learning"),
     ]
     
-    timeline = pd.DataFrame(roadmap, columns=["Week", "Skill"])
-    fig = px.timeline(timeline, x_start="Week", x_end="Week", y="Skill", color="Skill")
+    # Convert to datetime ranges for plotting
+    start_date = datetime.today()
+    timeline = []
+    for i, (week_label, skill) in enumerate(roadmap):
+        step_start = start_date + timedelta(weeks=i)
+        step_end = step_start + timedelta(weeks=1)
+        timeline.append({"Skill": skill, "Start": step_start, "Finish": step_end})
+    
+    timeline_df = pd.DataFrame(timeline)
+    
+    # Plot timeline
+    fig = px.timeline(timeline_df, x_start="Start", x_end="Finish", y="Skill", color="Skill")
+    fig.update_yaxes(autorange="reversed")  # Optional: show top skill at top
     st.plotly_chart(fig, use_container_width=True)
     
+    # Simulate future profile
     if st.button("✨ Simulate Future You"):
         st.markdown("""
         ## 🔮 Your Future LinkedIn Profile (1 year later)
