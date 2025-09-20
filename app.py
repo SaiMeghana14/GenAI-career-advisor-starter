@@ -299,7 +299,8 @@ if st.button("🚀 Recommend!"):
     # --------------------------
     # New: Gamification Progress & Badges
     # --------------------------
-    progress = len(matched) / len(expected_skills)
+    expected_skills = list(matched) + list(missing)
+    progress = len(matched) / len(expected_skills) if expected_skills else 0
     st.subheader("🏆 Skill Progress")
     st.progress(progress)
         
