@@ -40,7 +40,7 @@ except Exception:
 import google.generativeai as genai
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    MODEL_NAME = "gemini-1.5-flash"
+    MODEL_NAME = "gemini-2.5-flash"
     model = genai.GenerativeModel(MODEL_NAME)
 
     # quick sanity check
@@ -302,7 +302,7 @@ if st.button("🚀 Recommend!"):
     progress = len(matched) / len(expected_skills)
     st.subheader("🏆 Skill Progress")
     st.progress(progress)
-    
+        
     # --------------------------
     # Personalized Career Dashboard (KPIs)
     # --------------------------
@@ -486,7 +486,7 @@ if st.button("🚀 Recommend!"):
         ai_reply = "Thanks! (Enable Gemini for richer, tailored feedback.)"
         if GEMINI_OK:
             try:
-                model = genai.GenerativeModel("gemini-1.5-flash")
+                model = genai.GenerativeModel("gemini-2.5-flash")
                 prompt = f"You are a technical interviewer for the role {top_role['role']}. Provide concise, structured feedback on this candidate's answer. Answer:\n{user_msg}"
                 res = model.generate_content(prompt)
                 ai_reply = (res.text or "").strip() or ai_reply
