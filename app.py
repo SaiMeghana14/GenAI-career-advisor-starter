@@ -394,16 +394,67 @@ if st.button("🚀 Recommend!"):
     fig.update_yaxes(autorange="reversed")  # Optional: show top skill at top
     st.plotly_chart(fig, use_container_width=True)
     
-    # Simulate future profile
+    # --- Simulate Future Profile ---
     if st.button("✨ Simulate Future You"):
-        st.markdown("""
-        ## 🔮 Your Future LinkedIn Profile (1 year later)
+        st.subheader("🔮 Your Future LinkedIn Profile (1 year later)")
     
+        # Use role recommendation from your earlier pipeline
+        # (Assuming you already computed recommended_role, matched, missing)
+        future_role = recommended_role if 'recommended_role' in locals() else "AI Engineer"
+        
+        # Build headline from matched + future skills
+        headline_skills = list(matched)[:3] if 'matched' in locals() else ["Python", "ML", "SQL"]
+        headline = " | ".join(headline_skills + ["Emerging AI Skills"])
+    
+        # About section tailored to gaps
+        if 'missing' in locals() and missing:
+            about_section = (
+                f"Passionate about growing in {future_role}. "
+                f"Over the last year, I mastered {', '.join(list(missing)[:3])} "
+                "along with deepening my expertise in core AI/ML practices. "
+                "Eager to apply these skills in real-world projects."
+            )
+        else:
+            about_section = (
+                f"Thriving as a {future_role}, "
+                "building intelligent systems and solving impactful challenges "
+                "with cutting-edge AI."
+            )
+    
+        # Display profile mockup
+        st.markdown(f"""
         **Name:** GenAI Student  
-        **Role:** Data Scientist at TechCorp  
-        **Headline:** "AI Enthusiast | Python | ML | SQL | Deep Learning"  
-        **About:** Passionate about solving real-world problems using AI...
+        **Role:** {future_role}  
+        **Headline:** "{headline}"  
+    
+        **About:**  
+        {about_section}
         """)
+    
+        # Profile strength = ratio of matched skills to expected skills
+        if 'expected_skills' in locals() and expected_skills:
+            profile_strength = int((len(matched) / len(expected_skills)) * 100)
+        else:
+            profile_strength = 70
+        st.progress(profile_strength, text="Profile Strength")
+    
+        # Future skill levels: matched = high, missing = medium
+        future_skills = {}
+        for skill in matched:
+            future_skills[skill] = 85
+        if 'missing' in locals():
+            for skill in missing:
+                future_skills[skill] = 70
+    
+        if future_skills:
+            import plotly.express as px
+            import pandas as pd
+            df = pd.DataFrame(list(future_skills.items()), columns=["Skill", "Proficiency"])
+            fig = px.bar(df, x="Skill", y="Proficiency",
+                         title="Future Skill Levels (1 year later)",
+                         range_y=[0, 100])
+            st.plotly_chart(fig, use_container_width=True)
+
 
     # --------------------------
     # Interactive Visualizations
